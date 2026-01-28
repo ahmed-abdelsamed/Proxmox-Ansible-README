@@ -1,0 +1,31 @@
+vm_defaults:
+  node: pve
+  template: Rocky-9.7-Temp
+  storage: datavg
+  bridge: vmbr0
+  cores: 4
+  memory: 8192
+  ciuser: ahmed
+  cipassword: cl0ud
+  vm_start: false
+  dns: "1.1.1.1 8.8.8.8"
+  searchdomain: linkdev.net
+  gateway: 192.168.100.1
+
+template_vmid: 1000
+template_clone: Rocky-9.7-Temp
+
+vms:
+  - name: 54-pg-node1
+    vmid: 2001
+    ip: 192.168.100.54/24
+
+  - name: 55-pg-node2
+    ip: 192.168.100.55/24
+    vmid: 2002
+
+  - name: 56-pg-node3
+    vmid: 2003
+    ip: 192.168.100.56/24
+    cores: 4
+    memory: 8192
