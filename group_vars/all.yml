@@ -1,0 +1,37 @@
+- name: Create multiple VMs on Proxmox
+  hosts: proxmox
+  gather_facts: false
+  vars_files:
+    - vars/vms.yml
+
+  tasks:
+    - name: Clone VMs from template
+      community.general.proxmox_kvm:
+        api_host: "{{ proxmox_api_host }}"
+        api_user: "{{ proxmox_api_user }}"
+        api_token_id: "{{ proxmox_api_token_id }}"
+        api_token_secret: "{{ proxox_api_token_secret | default(proxmox_api_token_secret) }}"
+        validate_certs: "{{ proxmox_validate_certs }}"
+
+        node: "{{ item.node | default(vm_defaults.node) }}"
+        name: "{{ item.name }}"
+        clone: "{{ template_clone }}"
+        newid: "{{ item.vmid }}"
+        full: true
+        timeout: 600
+
+        cores: "{{ item.cores | default(vm_defaults.cores) }}"
+        memory: "{{ item.memory | default(vm_defaults.memory) }}"
+        storage: "{{ vm_defaults.storage }}"
+        scsihw: virtio-scsi-pci
+
+        net:
+          net0: "virtio,bridge={{ vm_defaults.bridge }}"
+
+        ipconfig:
+          ipconfig0: "ip={{ item.ip }},gw={{ vm_defaults.gateway }}"
+        nameservers: "{{ vm_defaults.dns }}"
+        searchdomains: "{{ vm_defaults.searchdomain }}"
+
+        state: present
+      loop: "{{ vms }}"
